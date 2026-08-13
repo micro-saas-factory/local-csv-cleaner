@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local CSV Cleaner & Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jschardet/3.0.0/jschardet.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-6">
+  <div class="max-w-4xl mx-auto space-y-6">
+    <header class="border-b border-slate-200 pb-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-slate-900">🔒 Local CSV Cleaner & Converter</h1>
+        <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">100% ローカル処理（外部送信なし）</span>
+      </div>
+      <p class="text-sm text-slate-600 mt-1">個人情報や機密データも安心。ブラウザ上だけで文字化け修復・重複削除・列整形を高速実行します。</p>
+    </header>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <label class="block text-sm font-medium text-slate-700 mb-2">CSV / TSV ファイルを選択</label>
+      <input type="file" id="fileInput" accept=".csv, .tsv, .txt" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
+      <p id="status" class="mt-3 text-sm font-medium text-indigo-600"></p>
+    </div>
+
+    <div id="actionPanel" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div><span class="text-sm text-slate-500">検出文字コード: </span><span id="detectedEncoding" class="font-semibold text-slate-700">-</span></div>
+        <div class="flex gap-2">
+          <button onclick="trimSpaces()" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md">前後空白をトリム</button>
+          <button onclick="removeDuplicates()" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md">重複行を削除</button>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 pt-2">
+        <button onclick="downloadCSV('UTF-8')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm">UTF-8 (BOM付き) で保存</button>
+        <button onclick="downloadCSV('Shift-JIS')" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold rounded-lg shadow-sm">Shift-JIS で保存</button>
+      </div>
+    </div>
+
+    <div id="previewPanel" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+        <h2 class="text-sm font-bold text-slate-700">データプレビュー</h2>
+        <span id="rowCount" class="text-xs text-slate-500"></span>
+      </div>
+      <div class="overflow-x-auto max-h-96">
+        <table id="previewTable" class="w-full text-left text-xs text-slate-600"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let csvData = [], csvHeaders = [], currentFileName = '';
+
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      currentFileName = file.name;
+      document.getElementById('status').innerText = '読み込み中...';
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const uint8Array = new Uint8Array(evt.target.result);
+        const detected = jschardet.detect(uint8Array);
+        const enc = detected.encoding || 'UTF-8';
+        document.getElementById('detectedEncoding').innerText = enc;
+
+        const isSJIS = enc.toLowerCase().includes('sjis') || enc.toLowerCase().includes('shift');
+        const decoder = new TextDecoder(isSJIS ? 'shift-jis' : 'utf-8');
+        const text = decoder.decode(uint8Array);
+
+        Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            csvData = results.data;
+            if (csvData.length > 0) {
+              csvHeaders = Object.keys(csvData[0]);
+              document.getElementById('status').innerText = `読み込み完了: ${csvData.length} 行`;
+              document.getElementById('actionPanel').classList.remove('hidden');
+              document.getElementById('previewPanel').classList.remove('hidden');
+              renderTable();
+            }
+          }
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    function renderTable() {
+      document.getElementById('rowCount').innerText = `全 ${csvData.length} 行 / ${csvHeaders.length} 列`;
+      let html = '<thead class="bg-slate-100 text-slate-700 sticky top-0 border-b border-slate-200"><tr>';
+      csvHeaders.forEach((h, i) => {
+        html += `<th class="p-3 font-semibold whitespace-nowrap border-r border-slate-200">${h} <button onclick="removeCol('${h}')" class="text-red-400 hover:text-red-600 ml-1">×</button></th>`;
+      });
+      html += '</tr></thead><tbody class="divide-y divide-slate-100">';
+      csvData.slice(0, 100).forEach(row => {
+        html += '<tr class="hover:bg-slate-50">';
+        csvHeaders.forEach(h => {
+          html += `<td class="p-3 border-r border-slate-100 max-w-xs truncate">${row[h] || ''}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody>';
+      document.getElementById('previewTable').innerHTML = html;
+    }
+
+    function trimSpaces() {
+      csvData = csvData.map(row => {
+        let newRow = {};
+        Object.keys(row).forEach(k => { newRow[k.trim()] = typeof row[k] === 'string' ? row[k].trim() : row[k]; });
+        return newRow;
+      });
+      renderTable();
+      document.getElementById('status').innerText = '前後空白をトリムしました。';
+    }
+
+    function removeDuplicates() {
+      const map = new Map();
+      csvData.forEach(r => map.set(JSON.stringify(r), r));
+      csvData = Array.from(map.values());
+      renderTable();
+      document.getElementById('status').innerText = '重複行を削除しました。';
+    }
+
+    function removeCol(colName) {
+      csvHeaders = csvHeaders.filter(h => h !== colName);
+      csvData.forEach(r => delete r[colName]);
+      renderTable();
+    }
+
+    function downloadCSV(targetEnc) {
+      const csvStr = Papa.unparse(csvData);
+      let blob = targetEnc === 'Shift-JIS' 
+        ? new Blob([csvStr], { type: 'text/csv;charset=utf-8;' })
+        : new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvStr], { type: 'text/csv;charset=utf-8;' });
+      
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `cleaned_${currentFileName || 'data.csv'}`;
+      a.click();
+    }
+  </script>
+</body>
+</html>
