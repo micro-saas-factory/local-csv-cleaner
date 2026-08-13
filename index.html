@@ -1,145 +1,64 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Local CSV Cleaner & Converter</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jschardet/3.0.0/jschardet.min.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.7">
+  <style type="text/css">
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Hiragino Mincho ProN'; -webkit-text-stroke: #000000}
+    p.p3 {margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Hiragino Mincho ProN'; -webkit-text-stroke: #000000}
+    p.p4 {margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px 'Hiragino Mincho ProN'; -webkit-text-stroke: #000000; min-height: 18.0px}
+    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'Hiragino Sans'; color: #000000; color: rgba(0, 0, 0, 0.85); -webkit-text-stroke: rgba(0, 0, 0, 0.85)}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 11.0px 'Helvetica Neue'; color: #000000; color: rgba(0, 0, 0, 0.85); -webkit-text-stroke: rgba(0, 0, 0, 0.85)}
+    span.s1 {font: 24.0px 'Apple Color Emoji'; font-kerning: none}
+    span.s2 {font-kerning: none}
+    span.s3 {font-kerning: none; background-color: #a4a4a4}
+    span.s4 {font: 12.0px 'Hiragino Mincho ProN'; font-kerning: none; -webkit-text-stroke: 0px #000000}
+    span.s5 {font: 11.0px 'Hiragino Sans'; font-kerning: none; background-color: #a4a4a4}
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 p-6">
-  <div class="max-w-4xl mx-auto space-y-6">
-    <header class="border-b border-slate-200 pb-4">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-slate-900">🔒 Local CSV Cleaner & Converter</h1>
-        <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">100% ローカル処理（外部送信なし）</span>
-      </div>
-      <p class="text-sm text-slate-600 mt-1">個人情報や機密データも安心。ブラウザ上だけで文字化け修復・重複削除・列整形を高速実行します。</p>
-    </header>
+<body>
+<h1 style="margin: 0.0px 0.0px 16.1px 0.0px; font: 24.0px 'Hiragino Mincho ProN'; -webkit-text-stroke: #000000"><span class="s1">🔒</span><span class="s2"><b> Local CSV Cleaner &amp; Converter</b><b></b></span></h1>
+<p class="p2"><span class="s2">100% ローカル処理（外部送信なし）</span></p>
+<p class="p3"><span class="s2">個人情報や機密データも安心。ブラウザ上だけで文字化け修復・重複削除・列整形を高速実行します。</span></p>
+<p class="p2"><span class="s2">CSV / TSV ファイルを選択</span></p>
+<p class="p4"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">検出文字コード: -</span></p>
+<p class="p5"><span class="s3">前後空白をトリム</span><span class="s4"> </span><span class="s3">重複行を削除</span></p>
+<p class="p6"><span class="s3">UTF-8 (BOM</span><span class="s5">付き</span><span class="s3">) </span><span class="s5">で保存</span><span class="s4"> </span><span class="s3">Shift-JIS </span><span class="s5">で保存</span></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px 'Hiragino Mincho ProN'; -webkit-text-stroke: #000000"><span class="s2"><b>データプレビュー</b><b></b></span></h2>
 
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-      <label class="block text-sm font-medium text-slate-700 mb-2">CSV / TSV ファイルを選択</label>
-      <input type="file" id="fileInput" accept=".csv, .tsv, .txt" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
-      <p id="status" class="mt-3 text-sm font-medium text-indigo-600"></p>
-    </div>
+<!-- フッターエリア -->
+<footer class="mt-12 pt-6 border-t border-slate-200 text-center text-xs text-slate-500">
+  <p>© 2026 Micro SaaS Factory. All rights reserved.</p>
+  <button onclick="document.getElementById('privacyModal').classList.remove('hidden')" class="mt-2 text-indigo-600 hover:underline">
+    プライバシーポリシー・利用規約
+  </button>
+</footer>
 
-    <div id="actionPanel" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-        <div><span class="text-sm text-slate-500">検出文字コード: </span><span id="detectedEncoding" class="font-semibold text-slate-700">-</span></div>
-        <div class="flex gap-2">
-          <button onclick="trimSpaces()" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md">前後空白をトリム</button>
-          <button onclick="removeDuplicates()" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md">重複行を削除</button>
-        </div>
-      </div>
-      <div class="flex items-center gap-3 pt-2">
-        <button onclick="downloadCSV('UTF-8')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm">UTF-8 (BOM付き) で保存</button>
-        <button onclick="downloadCSV('Shift-JIS')" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold rounded-lg shadow-sm">Shift-JIS で保存</button>
-      </div>
-    </div>
+<!-- プライバシーポリシー モーダル表示 -->
+<div id="privacyModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white max-w-2xl w-full p-6 rounded-xl shadow-lg max-h-[80vh] overflow-y-auto text-sm text-slate-700 space-y-4">
+    <h2 class="text-lg font-bold text-slate-900 border-b pb-2">プライバシーポリシー・利用規約</h2>
+    
+    <h3 class="font-bold text-slate-800">1. データの取り扱いについて</h3>
+    <p>当ツール（Local CSV Cleaner & Converter）は、アップロードされたCSV/TSVファイル等のデータを外部サーバーへ送信・保存することは一切ありません。すべてのデータ処理はユーザーのブラウザ内（ローカル環境）で完結します。</p>
+    
+    <h3 class="font-bold text-slate-800">2. 広告配信・解析ツールについて</h3>
+    <p>当サイトでは、第三者配信による広告サービス（Google AdSense等）およびアクセス解析ツールを利用する場合があります。これらはクッキー（Cookie）を使用し、サイトへの過去のアクセス情報に基づいて広告を配信またはアクセス状況を測定します。</p>
 
-    <div id="previewPanel" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-        <h2 class="text-sm font-bold text-slate-700">データプレビュー</h2>
-        <span id="rowCount" class="text-xs text-slate-500"></span>
-      </div>
-      <div class="overflow-x-auto max-h-96">
-        <table id="previewTable" class="w-full text-left text-xs text-slate-600"></table>
-      </div>
+    <h3 class="font-bold text-slate-800">3. 免責事項</h3>
+    <p>当ツールの利用により生じた直接的・間接的な損害について、運営者は一切の責任を負いません。重要なデータの処理にあたっては、事前にバックアップを取得した上でご利用ください。</p>
+
+    <div class="text-right pt-4">
+      <button onclick="document.getElementById('privacyModal').classList.add('hidden')" class="px-4 py-2 bg-slate-800 text-white font-semibold rounded-lg text-xs">
+        閉じる
+      </button>
     </div>
   </div>
+</div>
 
-  <script>
-    let csvData = [], csvHeaders = [], currentFileName = '';
-
-    document.getElementById('fileInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      currentFileName = file.name;
-      document.getElementById('status').innerText = '読み込み中...';
-
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const uint8Array = new Uint8Array(evt.target.result);
-        const detected = jschardet.detect(uint8Array);
-        const enc = detected.encoding || 'UTF-8';
-        document.getElementById('detectedEncoding').innerText = enc;
-
-        const isSJIS = enc.toLowerCase().includes('sjis') || enc.toLowerCase().includes('shift');
-        const decoder = new TextDecoder(isSJIS ? 'shift-jis' : 'utf-8');
-        const text = decoder.decode(uint8Array);
-
-        Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            csvData = results.data;
-            if (csvData.length > 0) {
-              csvHeaders = Object.keys(csvData[0]);
-              document.getElementById('status').innerText = `読み込み完了: ${csvData.length} 行`;
-              document.getElementById('actionPanel').classList.remove('hidden');
-              document.getElementById('previewPanel').classList.remove('hidden');
-              renderTable();
-            }
-          }
-        });
-      };
-      reader.readAsArrayBuffer(file);
-    });
-
-    function renderTable() {
-      document.getElementById('rowCount').innerText = `全 ${csvData.length} 行 / ${csvHeaders.length} 列`;
-      let html = '<thead class="bg-slate-100 text-slate-700 sticky top-0 border-b border-slate-200"><tr>';
-      csvHeaders.forEach((h, i) => {
-        html += `<th class="p-3 font-semibold whitespace-nowrap border-r border-slate-200">${h} <button onclick="removeCol('${h}')" class="text-red-400 hover:text-red-600 ml-1">×</button></th>`;
-      });
-      html += '</tr></thead><tbody class="divide-y divide-slate-100">';
-      csvData.slice(0, 100).forEach(row => {
-        html += '<tr class="hover:bg-slate-50">';
-        csvHeaders.forEach(h => {
-          html += `<td class="p-3 border-r border-slate-100 max-w-xs truncate">${row[h] || ''}</td>`;
-        });
-        html += '</tr>';
-      });
-      html += '</tbody>';
-      document.getElementById('previewTable').innerHTML = html;
-    }
-
-    function trimSpaces() {
-      csvData = csvData.map(row => {
-        let newRow = {};
-        Object.keys(row).forEach(k => { newRow[k.trim()] = typeof row[k] === 'string' ? row[k].trim() : row[k]; });
-        return newRow;
-      });
-      renderTable();
-      document.getElementById('status').innerText = '前後空白をトリムしました。';
-    }
-
-    function removeDuplicates() {
-      const map = new Map();
-      csvData.forEach(r => map.set(JSON.stringify(r), r));
-      csvData = Array.from(map.values());
-      renderTable();
-      document.getElementById('status').innerText = '重複行を削除しました。';
-    }
-
-    function removeCol(colName) {
-      csvHeaders = csvHeaders.filter(h => h !== colName);
-      csvData.forEach(r => delete r[colName]);
-      renderTable();
-    }
-
-    function downloadCSV(targetEnc) {
-      const csvStr = Papa.unparse(csvData);
-      let blob = targetEnc === 'Shift-JIS' 
-        ? new Blob([csvStr], { type: 'text/csv;charset=utf-8;' })
-        : new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvStr], { type: 'text/csv;charset=utf-8;' });
-      
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `cleaned_${currentFileName || 'data.csv'}`;
-      a.click();
-    }
-  </script>
 </body>
 </html>
